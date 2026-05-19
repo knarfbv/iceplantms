@@ -238,6 +238,12 @@
   .grid {
     display: grid;
   }
+  .hidden {
+    display: none;
+  }
+  .inline {
+    display: inline;
+  }
   .table {
     display: table;
   }
@@ -488,6 +494,9 @@
   .text-ice-300 {
     color: var(--color-ice-300);
   }
+  .text-ice-500 {
+    color: var(--color-ice-500);
+  }
   .text-ice-600 {
     color: var(--color-ice-600);
   }
@@ -550,6 +559,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-frost-700);
+      }
+    }
+  }
+  .hover\:text-ice-700 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-ice-700);
       }
     }
   }

@@ -116,3 +116,20 @@ def order_item_add(request, order_pk):
         inventory.save()
         return redirect('order_detail', pk=order_pk)
     return render(request, 'orders/item_form.html', {'form': form, 'order': order})
+
+def order_item_edit(request, order_pk, pk):
+    order = get_object_or_404(Order, pk=order_pk)
+    item = get_object_or_404(OrderItem, pk=pk, order=order)
+    form = OrderItemForm(request.POST or None, instance=item)
+    if form.is_valid():
+        form.save()
+        return redirect('order_detail', pk=order_pk)
+    return render(request, 'orders/item_form.html', {'form': form, 'order': order, 'item': item})
+
+def order_item_delete(request, order_pk, pk):
+    order = get_object_or_404(Order, pk=order_pk)
+    item = get_object_or_404(OrderItem, pk=pk, order=order)
+    if request.method == 'POST':
+        item.delete()
+        return redirect('order_detail', pk=order_pk)
+    return redirect('order_detail', pk=order_pk)

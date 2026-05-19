@@ -46,9 +46,11 @@
 <div class="bg-white rounded-xl border border-frost-200 overflow-hidden">
     <div class="flex items-center justify-between px-6 py-4 border-b border-frost-100">
         <h3 class="text-sm font-medium text-arctic-800">Order Items</h3>
+        {% if order.status == 'pending' %}
         <a href="{% url 'order_item_add' order.pk %}" class="bg-ice-500 hover:bg-ice-600 text-white text-xs px-3 py-1.5 rounded-lg transition">
             + Add Item
         </a>
+        {% endif %}
     </div>
     <table class="w-full text-sm">
         <thead class="bg-frost-100 text-frost-600 uppercase text-xs">
@@ -57,6 +59,7 @@
                 <th class="px-6 py-3 text-left">Quantity</th>
                 <th class="px-6 py-3 text-left">Unit Price</th>
                 <th class="px-6 py-3 text-left">Subtotal</th>
+                <th class="px-6 py-3 text-left">Actions</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-frost-100">
@@ -66,17 +69,36 @@
                 <td class="px-6 py-4 text-frost-600">{{ item.quantity }}</td>
                 <td class="px-6 py-4 text-frost-600">₱{{ item.unit_price }}</td>
                 <td class="px-6 py-4 text-frost-600">₱{{ item.subtotal }}</td>
+                {% if order.status == 'pending' %}
+                <td class="px-6 py-4 text-frost-600">
+                    <div class="flex items-center gap-3">
+                        <a href="{% url 'order_item_edit' order.pk item.pk %}" class="text-ice-500 hover:text-ice-700 text-xs transition">
+                            Edit
+                        </a>
+                        <form method="POST" action="{% url 'order_item_delete' order.pk item.pk %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-400 hover:text-red-600 text-xs transition">
+                                Remove
+                            </button>
+                        </form>
+                    </div>
+                </td>
+                {% else %}
+                <td class="px-6 py-4 text-frost-600">
+                    <span class="text-frost-400 text-xs">-</span>
+                </td>
+                {% endif %}
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="px-6 py-8 text-center text-frost-400">No items yet.</td>
+                <td colspan="5" class="px-6 py-8 text-center text-frost-400">No items yet.</td>
             </tr>
             {% endfor %}
         </tbody>
         {% if items %}
         <tfoot class="bg-frost-50">
             <tr>
-                <td colspan="3" class="px-6 py-4 text-right text-sm font-medium text-arctic-800">Total</td>
+                <td colspan="4" class="px-6 py-4 text-right text-sm font-medium text-arctic-800">Total</td>
                 <td class="px-6 py-4 text-sm font-semibold text-arctic-800">₱{{ order.total }}</td>
             </tr>
         </tfoot>
