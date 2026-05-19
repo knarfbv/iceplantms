@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
 from .models import IceProduct, Inventory, Customer, Order, OrderItem
 from .forms import IceProductForm, InventoryForm, CustomerForm, OrderForm, OrderItemForm
 
@@ -52,8 +53,16 @@ def inventory_edit(request, pk):
 
 
 def customer_list(request):
-    customers = Customer.objects.all()
-    return render(request, 'customers/list.html', {'customers': customers})
+    query = request.GET.get('q', '')
+    if query:
+        customers = Customer.objects.filter(
+            Q(name__icontains=query) |
+            Q(phone__icontains=query) |
+            Q(address__icontains=query)
+        )
+    else:
+        customers = Customer.objects.all()
+    return render(request, 'customers/list.html', {'customers': customers, 'query': query})
 
 def customer_add(request):
     form = CustomerForm(request.POST or None)
@@ -79,8 +88,16 @@ def customer_delete(request, pk):
 
 
 def order_list(request):
-    orders = Order.objects.select_related('customer').all()
-    return render(request, 'orders/list.html', {'orders': orders})
+    query = request.GET.get('q', '')
+    orders = Order.objects.select_related('customer')
+    if query:
+        orders = orders.filter(
+            Q(id__icontains=query) |
+            Q(customer__name__icontains=query) |
+            Q(status__icontains=query)
+        )
+    orders = orders.all()
+    return render(request, 'orders/list.html', {'orders': orders, 'query': query})
 
 def order_add(request):
     form = OrderForm(request.POST or None)
