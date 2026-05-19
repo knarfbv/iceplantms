@@ -1,55 +1,47 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
-from .models import IceProduct, Inventory, Customer, Order, OrderItem
-from .forms import IceProductForm, InventoryForm, CustomerForm, OrderForm, OrderItemForm
+from .models import Inventory, Customer, Order, OrderItem
+from .forms import InventoryForm, CustomerForm, OrderForm, OrderItemForm
 
 # Create your views here.
 
-def product_list(request):
-    products = IceProduct.objects.all()
-    return render(request, 'products/list.html', {'products': products})
-
-def product_add(request):
-    form = IceProductForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-        return redirect('product_list')
-    return render(request, 'products/form.html', {'form': form})
-
-def product_edit(request, pk):
-    product = get_object_or_404(IceProduct, pk=pk)
-    form = IceProductForm(request.POST or None, instance=product)
-    if form.is_valid():
-        form.save()
-        return redirect('product_list')
-    return render(request, 'products/form.html', {'form': form})
-
-def product_delete(request, pk):
-    product = get_object_or_404(IceProduct, pk=pk)
-    if request.method == 'POST':
-        product.delete()
-        return redirect('product_list')
-    return render(request, 'products/delete.html', {'product': product})
-
-
 def inventory_list(request):
-    inventory = Inventory.objects.select_related('product').all()
-    return render(request, 'inventory/list.html', {'inventory': inventory})
+    items = Inventory.objects.all()
+    return render(request, 'inventory/list.html', {'items': items})
 
 def inventory_add(request):
     form = InventoryForm(request.POST or None)
     if form.is_valid():
-        form.save()
+        item = form.save(commit=False)
+        item.quantity = 0
+        item.save()
         return redirect('inventory_list')
     return render(request, 'inventory/form.html', {'form': form})
 
 def inventory_edit(request, pk):
-    inventory = get_object_or_404(Inventory, pk=pk)
-    form = InventoryForm(request.POST or None, instance=inventory)
+    item = get_object_or_404(Inventory, pk=pk)
+    form = InventoryForm(request.POST or None, instance=item)
     if form.is_valid():
         form.save()
         return redirect('inventory_list')
     return render(request, 'inventory/form.html', {'form': form})
+
+def inventory_delete(request, pk):
+    item = get_object_or_404(Inventory, pk=pk)
+    if request.method == 'POST':
+        item.delete()
+        return redirect('inventory_list')
+    return render(request, 'inventory/delete.html', {'item': item})
+
+def inventory_add_stock(request, pk):
+    item = get_object_or_404(Inventory, pk=pk)
+    if request.method == 'POST':
+        added = int(request.POST.get('quantity', 0))
+        if added > 0:
+            item.quantity += added
+            item.save()
+        return redirect('inventory_list')
+    return render(request, 'inventory/add_stock.html', {'item': item})
 
 
 def customer_list(request):
@@ -108,7 +100,7 @@ def order_add(request):
 
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
-    items = order.items.select_related('product').all()
+    items = order.items.select_related('item').all()
     return render(request, 'orders/detail.html', {'order': order, 'items': items})
 
 def order_update_status(request, pk):
@@ -128,9 +120,9 @@ def order_item_add(request, order_pk):
         item = form.save(commit=False)
         item.order = order
         item.save()
-        inventory = get_object_or_404(Inventory, product=item.product)
-        inventory.quantity -= item.quantity
-        inventory.save()
+        inventory_item = item.item
+        inventory_item.quantity -= item.quantity
+        inventory_item.save()
         return redirect('order_detail', pk=order_pk)
     return render(request, 'orders/item_form.html', {'form': form, 'order': order})
 

@@ -2,20 +2,15 @@ from django.db import models
 
 # Create your models here.
 
-class IceProduct(models.Model):
+class Inventory(models.Model):
     name = models.CharField(max_length=100)
     size = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=5, decimal_places=2)
+    quantity = models.PositiveIntegerField(default=0)
+    last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
-
-class Inventory(models.Model):
-    product = models.OneToOneField(IceProduct, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f"{self.product.name} - {self.quantity}"
 
 class Customer(models.Model):
     name = models.CharField(max_length=100)
@@ -38,23 +33,23 @@ class Order(models.Model):
 
     @property
     def total(self):
-        return sum(item.quantity * item.product.price for item in self.items.all())
+        return sum(item.quantity * item.item.price for item in self.items.all())
 
     def __str__(self):
         return f"Order #{self.pk} - {self.customer.name}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey(IceProduct, on_delete=models.CASCADE)
+    item = models.ForeignKey(Inventory, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
 
     @property
     def unit_price(self):
-        return self.product.price
+        return self.item.price
 
     @property
     def subtotal(self):
-        return self.quantity * self.product.price
+        return self.quantity * self.item.price
 
     def __str__(self):
-        return f"{self.quantity}x {self.product.name}"
+        return f"{self.quantity}x {self.item.name}"

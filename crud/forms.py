@@ -1,15 +1,10 @@
 from django import forms
-from .models import IceProduct, Inventory, Customer, Order, OrderItem
-
-class IceProductForm(forms.ModelForm):
-    class Meta:
-        model = IceProduct
-        fields = ['name', 'size', 'price']
+from .models import Inventory, Customer, Order, OrderItem
 
 class InventoryForm(forms.ModelForm):
     class Meta:
         model = Inventory
-        fields = ['product', 'quantity']
+        fields = ['name', 'size', 'price']
 
 class CustomerForm(forms.ModelForm):
     class Meta:
@@ -24,4 +19,4 @@ class OrderForm(forms.ModelForm):
 class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity']
+        fields = ['item', 'quantity']
