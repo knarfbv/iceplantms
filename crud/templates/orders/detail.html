@@ -3,9 +3,16 @@
 {% block 'title' %}Order #{{ order.pk }}{% endblock %}
 
 {% block 'content' %}
-<div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-semibold text-arctic-800">Order #{{ order.pk }}</h2>
-    <a href="{% url 'order_list' %}" class="text-sm text-frost-500 hover:text-frost-700 transition">← Back</a>
+<div class="mb-6">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-semibold text-arctic-800">Order #{{ order.pk }}</h2>
+        <a href="{% url 'order_list' %}" class="text-sm text-frost-500 hover:text-frost-700 transition">← Back</a>
+    </div>
+    {% if order.status == 'pending' or order.status == 'cancelled' %}
+    <a href="{% url 'order_delete' order.pk %}" class="bg-red-400 hover:bg-red-500 text-white text-sm px-4 py-2 rounded-lg transition">
+        Delete Order
+    </a>
+    {% endif %}
 </div>
 
 <div class="grid grid-cols-2 gap-6 mb-6">

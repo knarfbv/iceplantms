@@ -145,6 +145,16 @@ def order_detail(request, pk):
     return render(request, 'orders/detail.html', {'order': order, 'items': items})
 
 @login_required(login_url='login')
+def order_delete(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    if order.status not in ['pending', 'cancelled']:
+        return redirect('order_detail', pk=pk)
+    if request.method == 'POST':
+        order.delete()
+        return redirect('order_list')
+    return render(request, 'orders/delete.html', {'order': order})
+
+@login_required(login_url='login')
 def order_update_status(request, pk):
     order = get_object_or_404(Order, pk=pk)
     if request.method == 'POST':
