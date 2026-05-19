@@ -1,11 +1,32 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from .models import Inventory, Customer, Order, OrderItem
 from .forms import InventoryForm, CustomerForm, OrderForm, OrderItemForm
 
 # Create your views here.
 
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('order_list')
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('order_list')
+        return render(request, 'auth/login.html', {'error': 'Invalid username or password.'})
+    return render(request, 'auth/login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+
+@login_required(login_url='login')
 def inventory_list(request):
     items = Inventory.objects.all()
     return render(request, 'inventory/list.html', {'items': items})
@@ -19,6 +40,7 @@ def inventory_add(request):
         return redirect('inventory_list')
     return render(request, 'inventory/form.html', {'form': form})
 
+@login_required(login_url='login')
 def inventory_edit(request, pk):
     item = get_object_or_404(Inventory, pk=pk)
     form = InventoryForm(request.POST or None, instance=item)
@@ -27,6 +49,7 @@ def inventory_edit(request, pk):
         return redirect('inventory_list')
     return render(request, 'inventory/form.html', {'form': form})
 
+@login_required(login_url='login')
 def inventory_delete(request, pk):
     item = get_object_or_404(Inventory, pk=pk)
     if request.method == 'POST':
@@ -34,6 +57,7 @@ def inventory_delete(request, pk):
         return redirect('inventory_list')
     return render(request, 'inventory/delete.html', {'item': item})
 
+@login_required(login_url='login')
 def inventory_add_stock(request, pk):
     item = get_object_or_404(Inventory, pk=pk)
     if request.method == 'POST':
@@ -45,6 +69,7 @@ def inventory_add_stock(request, pk):
     return render(request, 'inventory/add_stock.html', {'item': item})
 
 
+@login_required(login_url='login')
 def customer_list(request):
     query = request.GET.get('q', '')
     if query:
@@ -62,6 +87,7 @@ def customer_list(request):
     
     return render(request, 'customers/list.html', {'customers': customers, 'query': query})
 
+@login_required(login_url='login')
 def customer_add(request):
     form = CustomerForm(request.POST or None)
     if form.is_valid():
@@ -69,6 +95,7 @@ def customer_add(request):
         return redirect('customer_list')
     return render(request, 'customers/form.html', {'form': form})
 
+@login_required(login_url='login')
 def customer_edit(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
     form = CustomerForm(request.POST or None, instance=customer)
@@ -77,6 +104,7 @@ def customer_edit(request, pk):
         return redirect('customer_list')
     return render(request, 'customers/form.html', {'form': form})
 
+@login_required(login_url='login')
 def customer_delete(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
     if request.method == 'POST':
@@ -85,6 +113,7 @@ def customer_delete(request, pk):
     return render(request, 'customers/delete.html', {'customer': customer})
 
 
+@login_required(login_url='login')
 def order_list(request):
     query = request.GET.get('q', '')
     orders_list = Order.objects.select_related('customer')
@@ -101,6 +130,7 @@ def order_list(request):
     
     return render(request, 'orders/list.html', {'orders': orders, 'query': query})
 
+@login_required(login_url='login')
 def order_add(request):
     form = OrderForm(request.POST or None)
     if form.is_valid():
@@ -108,11 +138,13 @@ def order_add(request):
         return redirect('order_detail', pk=form.instance.pk)
     return render(request, 'orders/form.html', {'form': form})
 
+@login_required(login_url='login')
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
     items = order.items.select_related('item').all()
     return render(request, 'orders/detail.html', {'order': order, 'items': items})
 
+@login_required(login_url='login')
 def order_update_status(request, pk):
     order = get_object_or_404(Order, pk=pk)
     if request.method == 'POST':
@@ -123,6 +155,7 @@ def order_update_status(request, pk):
             return redirect('order_detail', pk=pk)
     return redirect('order_detail', pk=pk)
 
+@login_required(login_url='login')
 def order_item_add(request, order_pk):
     order = get_object_or_404(Order, pk=order_pk)
     form = OrderItemForm(request.POST or None)
@@ -136,6 +169,7 @@ def order_item_add(request, order_pk):
         return redirect('order_detail', pk=order_pk)
     return render(request, 'orders/item_form.html', {'form': form, 'order': order})
 
+@login_required(login_url='login')
 def order_item_edit(request, order_pk, pk):
     order = get_object_or_404(Order, pk=order_pk)
     item = get_object_or_404(OrderItem, pk=pk, order=order)
@@ -145,6 +179,7 @@ def order_item_edit(request, order_pk, pk):
         return redirect('order_detail', pk=order_pk)
     return render(request, 'orders/item_form.html', {'form': form, 'order': order, 'item': item})
 
+@login_required(login_url='login')
 def order_item_delete(request, order_pk, pk):
     order = get_object_or_404(Order, pk=order_pk)
     item = get_object_or_404(OrderItem, pk=pk, order=order)

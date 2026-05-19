@@ -16,7 +16,12 @@
         </a>
     </nav>
 
-    <div class="px-6 py-4 border-t border-arctic-700 text-xs text-frost-500">
-        ITE 2 Project
+    <div class="px-4 py-4 border-t border-arctic-700">
+        <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="w-full text-left text-sm text-frost-400 hover:text-white px-3 py-2 rounded-lg hover:bg-arctic-700 transition">
+                Sign out
+            </button>
+        </form>
     </div>
 </aside>
