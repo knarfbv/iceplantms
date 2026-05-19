@@ -28,7 +28,7 @@ def product_delete(request, pk):
     if request.method == 'POST':
         product.delete()
         return redirect('product_list')
-    return render(request, 'products/confirm_delete.html', {'product': product})
+    return render(request, 'products/delete.html', {'product': product})
 
 
 def inventory_list(request):
@@ -75,7 +75,7 @@ def customer_delete(request, pk):
     if request.method == 'POST':
         customer.delete()
         return redirect('customer_list')
-    return render(request, 'customers/confirm_delete.html', {'customer': customer})
+    return render(request, 'customers/delete.html', {'customer': customer})
 
 
 def order_list(request):
@@ -86,7 +86,7 @@ def order_add(request):
     form = OrderForm(request.POST or None)
     if form.is_valid():
         form.save()
-        return redirect('order_list')
+        return redirect('order_detail', pk=form.instance.pk)
     return render(request, 'orders/form.html', {'form': form})
 
 def order_detail(request, pk):
@@ -96,11 +96,13 @@ def order_detail(request, pk):
 
 def order_update_status(request, pk):
     order = get_object_or_404(Order, pk=pk)
-    form = OrderForm(request.POST or None, instance=order)
-    if form.is_valid():
-        form.save()
-        return redirect('order_detail', pk=pk)
-    return render(request, 'orders/form.html', {'form': form})
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        if status in dict(Order.STATUS_CHOICES):
+            order.status = status
+            order.save()
+            return redirect('order_detail', pk=pk)
+    return redirect('order_detail', pk=pk)
 
 def order_item_add(request, order_pk):
     order = get_object_or_404(Order, pk=order_pk)

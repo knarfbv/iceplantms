@@ -1,0 +1,42 @@
+{% extends 'layout/base.html' %}
+
+{% block 'title' %}Products{% endblock %}
+
+{% block 'content' %}
+<div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-semibold text-arctic-800">Products</h2>
+    <a href="{% url 'product_add' %}" class="bg-ice-500 hover:bg-ice-600 text-white text-sm px-4 py-2 rounded-lg transition">
+        + Add Product
+    </a>
+</div>
+
+<div class="bg-white rounded-xl border border-frost-200 overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-frost-100 text-frost-600 uppercase text-xs">
+            <tr>
+                <th class="px-6 py-3 text-left">Name</th>
+                <th class="px-6 py-3 text-left">Size</th>
+                <th class="px-6 py-3 text-left">Price</th>
+                <th class="px-6 py-3 text-left">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-frost-100">
+            {% for product in products %}
+            <tr class="hover:bg-frost-50 transition">
+                <td class="px-6 py-4 text-arctic-800 font-medium">{{ product.name }}</td>
+                <td class="px-6 py-4 text-frost-600">{{ product.size }}</td>
+                <td class="px-6 py-4 text-frost-600">₱{{ product.price }}</td>
+                <td class="px-6 py-4 flex gap-3">
+                    <a href="{% url 'product_edit' product.pk %}" class="text-ice-600 hover:text-ice-800 transition">Edit</a>
+                    <a href="{% url 'product_delete' product.pk %}" class="text-red-400 hover:text-red-600 transition">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="px-6 py-8 text-center text-frost-400">No products yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

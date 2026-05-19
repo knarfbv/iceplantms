@@ -7,7 +7,10 @@
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
     <title>{% block 'title' %}{% endblock 'title' %}</title>
 </head>
-<body>
-    {% block 'content' %}{% endblock 'content' %}
+<body class="flex h-screen bg-frost-50 text-frost-900">
+    {% include 'include/sidebar.html' %}
+    <main class="flex-1 overflow-y-auto p-8">
+        {% block 'content' %}{% endblock 'content' %}
+    </main>
 </body>
 </html>

@@ -1,0 +1,25 @@
+<aside class="w-64 bg-arctic-800 text-frost-100 flex flex-col">
+    <div class="px-6 py-5 border-b border-arctic-700">
+        <h1 class="text-lg font-semibold text-ice-300">IcePlant MS</h1>
+        <p class="text-xs text-frost-400 mt-0.5">Management System</p>
+    </div>
+
+    <nav class="flex-1 px-4 py-6 space-y-1">
+        <a href="{% url 'product_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-frost-200 hover:bg-arctic-700 hover:text-white transition">
+            🧊 Products
+        </a>
+        <a href="{% url 'inventory_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-frost-200 hover:bg-arctic-700 hover:text-white transition">
+            📦 Inventory
+        </a>
+        <a href="{% url 'customer_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-frost-200 hover:bg-arctic-700 hover:text-white transition">
+            👤 Customers
+        </a>
+        <a href="{% url 'order_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-frost-200 hover:bg-arctic-700 hover:text-white transition">
+            🧾 Orders
+        </a>
+    </nav>
+
+    <div class="px-6 py-4 border-t border-arctic-700 text-xs text-frost-500">
+        ITE 2 Project
+    </div>
+</aside>

@@ -1,0 +1,42 @@
+{% extends 'layout/base.html' %}
+
+{% block 'title' %}Customers{% endblock %}
+
+{% block 'content' %}
+<div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-semibold text-arctic-800">Customers</h2>
+    <a href="{% url 'customer_add' %}" class="bg-ice-500 hover:bg-ice-600 text-white text-sm px-4 py-2 rounded-lg transition">
+        + Add Customer
+    </a>
+</div>
+
+<div class="bg-white rounded-xl border border-frost-200 overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-frost-100 text-frost-600 uppercase text-xs">
+            <tr>
+                <th class="px-6 py-3 text-left">Name</th>
+                <th class="px-6 py-3 text-left">Phone</th>
+                <th class="px-6 py-3 text-left">Address</th>
+                <th class="px-6 py-3 text-left">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-frost-100">
+            {% for customer in customers %}
+            <tr class="hover:bg-frost-50 transition">
+                <td class="px-6 py-4 text-arctic-800 font-medium">{{ customer.name }}</td>
+                <td class="px-6 py-4 text-frost-600">{{ customer.phone }}</td>
+                <td class="px-6 py-4 text-frost-600">{{ customer.address }}</td>
+                <td class="px-6 py-4 flex gap-3">
+                    <a href="{% url 'customer_edit' customer.pk %}" class="text-ice-600 hover:text-ice-800 transition">Edit</a>
+                    <a href="{% url 'customer_delete' customer.pk %}" class="text-red-400 hover:text-red-600 transition">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="px-6 py-8 text-center text-frost-400">No customers yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

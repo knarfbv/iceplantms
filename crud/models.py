@@ -4,7 +4,7 @@ from django.db import models
 
 class IceProduct(models.Model):
     name = models.CharField(max_length=100)
-    size = models.CharField(max_length=50, default="kg")
+    size = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
@@ -47,6 +47,14 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     product = models.ForeignKey(IceProduct, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+
+    @property
+    def unit_price(self):
+        return self.product.price
+
+    @property
+    def subtotal(self):
+        return self.quantity * self.product.price
 
     def __str__(self):
         return f"{self.quantity}x {self.product.name}"
