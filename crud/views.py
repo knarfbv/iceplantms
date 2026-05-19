@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
+from django.core.paginator import Paginator
 from .models import Inventory, Customer, Order, OrderItem
 from .forms import InventoryForm, CustomerForm, OrderForm, OrderItemForm
 
@@ -47,13 +48,18 @@ def inventory_add_stock(request, pk):
 def customer_list(request):
     query = request.GET.get('q', '')
     if query:
-        customers = Customer.objects.filter(
+        customers_list = Customer.objects.filter(
             Q(name__icontains=query) |
             Q(phone__icontains=query) |
             Q(address__icontains=query)
         )
     else:
-        customers = Customer.objects.all()
+        customers_list = Customer.objects.all()
+    
+    paginator = Paginator(customers_list, 10)
+    page_number = request.GET.get('page')
+    customers = paginator.get_page(page_number)
+    
     return render(request, 'customers/list.html', {'customers': customers, 'query': query})
 
 def customer_add(request):
@@ -81,14 +87,18 @@ def customer_delete(request, pk):
 
 def order_list(request):
     query = request.GET.get('q', '')
-    orders = Order.objects.select_related('customer')
+    orders_list = Order.objects.select_related('customer')
     if query:
-        orders = orders.filter(
+        orders_list = orders_list.filter(
             Q(id__icontains=query) |
             Q(customer__name__icontains=query) |
             Q(status__icontains=query)
         )
-    orders = orders.all()
+    
+    paginator = Paginator(orders_list, 10)
+    page_number = request.GET.get('page')
+    orders = paginator.get_page(page_number)
+    
     return render(request, 'orders/list.html', {'orders': orders, 'query': query})
 
 def order_add(request):

@@ -58,4 +58,35 @@
         </tbody>
     </table>
 </div>
+
+{% if customers.has_other_pages %}
+<nav class="flex justify-between items-center mt-6 px-6 py-4 border-t border-frost-200">
+    <div class="flex items-center gap-2">
+        {% if customers.has_previous %}
+            <a href="?{% if query %}q={{ query }}&{% endif %}page=1" class="px-3 py-1 border border-frost-300 rounded hover:bg-frost-50">Prev</a>
+        {% else %}
+            <span class="px-3 py-1 border border-frost-200 rounded text-frost-400">Prev</span>
+        {% endif %}
+        
+        {% for num in customers.paginator.page_range %}
+            {% if customers.number == num and num > customers.number|add:'-2' and num < customers.number|add:'2' or num < 3 or num > customers.paginator.num_pages|add:'-2' %}
+                {% if customers.number == num %}
+                    <span class="px-3 py-1 bg-ice-500 text-white rounded">{{ num }}</span>
+                {% else %}
+                    <a href="?{% if query %}q={{ query }}&{% endif %}page={{ num }}" class="px-3 py-1 border border-frost-300 rounded hover:bg-frost-50">{{ num }}</a>
+                {% endif %}
+            {% elif num == 3 or num == customers.paginator.num_pages|add:'-2' %}
+                <span class="px-2 text-frost-400">…</span>
+            {% endif %}
+        {% endfor %}
+        
+        {% if customers.has_next %}
+            <a href="?{% if query %}q={{ query }}&{% endif %}page={{ customers.paginator.num_pages }}" class="px-3 py-1 border border-frost-300 rounded hover:bg-frost-50">Next</a>
+        {% else %}
+            <span class="px-3 py-1 border border-frost-200 rounded text-frost-400">Next</span>
+        {% endif %}
+    </div>
+    <span class="text-sm text-frost-500">Page {{ customers.number }} of {{ customers.paginator.num_pages }}</span>
+</nav>
+{% endif %}
 {% endblock %}
