@@ -64,7 +64,7 @@ def inventory_update_stock(request, pk):
         import json
         data = json.loads(request.body)
         item = get_object_or_404(Inventory, pk=pk)
-        quantity = int(data.get('quantity', 0))
+        quantity = int(data.get('quantity') or 0)
         if quantity >= 0:
             item.quantity = quantity
             item.save()
@@ -84,11 +84,11 @@ def customer_list(request):
         )
     else:
         customers_list = Customer.objects.all()
-    
+
     paginator = Paginator(customers_list, 10)
     page_number = request.GET.get('page')
     customers = paginator.get_page(page_number)
-    
+
     return render(request, 'customers/list.html', {'customers': customers, 'query': query})
 
 @login_required(login_url='login')
@@ -127,11 +127,11 @@ def order_list(request):
             Q(customer__name__icontains=query) |
             Q(status__icontains=query)
         )
-    
+
     paginator = Paginator(orders_list, 10)
     page_number = request.GET.get('page')
     orders = paginator.get_page(page_number)
-    
+
     return render(request, 'orders/list.html', {'orders': orders, 'query': query})
 
 @login_required(login_url='login')
@@ -154,6 +154,10 @@ def order_delete(request, pk):
     if order.status not in ['pending', 'cancelled']:
         return redirect('order_detail', pk=pk)
     if request.method == 'POST':
+        if order.status == 'pending':
+            for order_item in order.items.select_related('item').all():
+                order_item.item.quantity += order_item.quantity
+                order_item.item.save()
         order.delete()
         return redirect('order_list')
     return render(request, 'orders/delete.html', {'order': order})
@@ -164,6 +168,14 @@ def order_update_status(request, pk):
     if request.method == 'POST':
         status = request.POST.get('status')
         if status in dict(Order.STATUS_CHOICES):
+            if status == 'cancelled' and order.status != 'cancelled':
+                for order_item in order.items.select_related('item').all():
+                    order_item.item.quantity += order_item.quantity
+                    order_item.item.save()
+            elif order.status == 'cancelled' and status != 'cancelled':
+                for order_item in order.items.select_related('item').all():
+                    order_item.item.quantity -= order_item.quantity
+                    order_item.item.save()
             order.status = status
             order.save()
             return redirect('order_detail', pk=pk)
@@ -174,30 +186,45 @@ def order_item_add(request, order_pk):
     order = get_object_or_404(Order, pk=order_pk)
     form = OrderItemForm(request.POST or None)
     if form.is_valid():
-        item = form.save(commit=False)
-        item.order = order
-        item.save()
-        inventory_item = item.item
-        inventory_item.quantity -= item.quantity
-        inventory_item.save()
-        return redirect('order_detail', pk=order_pk)
+        order_item = form.save(commit=False)
+        order_item.order = order
+        inventory_item = order_item.item
+        if inventory_item.quantity < order_item.quantity:
+            form.add_error('quantity', 'Not enough stock available.')
+        else:
+            order_item.save()
+            inventory_item.quantity -= order_item.quantity
+            inventory_item.save()
+            return redirect('order_detail', pk=order_pk)
     return render(request, 'orders/item_form.html', {'form': form, 'order': order})
 
 @login_required(login_url='login')
 def order_item_edit(request, order_pk, pk):
     order = get_object_or_404(Order, pk=order_pk)
-    item = get_object_or_404(OrderItem, pk=pk, order=order)
-    form = OrderItemForm(request.POST or None, instance=item)
+    order_item = get_object_or_404(OrderItem, pk=pk, order=order)
+    old_quantity = order_item.quantity
+    form = OrderItemForm(request.POST or None, instance=order_item)
     if form.is_valid():
-        form.save()
-        return redirect('order_detail', pk=order_pk)
-    return render(request, 'orders/item_form.html', {'form': form, 'order': order, 'item': item})
+        new_quantity = form.cleaned_data['quantity']
+        diff = new_quantity - old_quantity
+        inventory_item = order_item.item
+        if diff > 0 and inventory_item.quantity < diff:
+            form.add_error('quantity', 'Not enough stock.')
+        else:
+            form.save()
+            inventory_item.quantity -= diff
+            inventory_item.save()
+            return redirect('order_detail', pk=order_pk)
+    return render(request, 'orders/item_form.html', {'form': form, 'order': order, 'item': order_item})
 
 @login_required(login_url='login')
 def order_item_delete(request, order_pk, pk):
     order = get_object_or_404(Order, pk=order_pk)
-    item = get_object_or_404(OrderItem, pk=pk, order=order)
+    order_item = get_object_or_404(OrderItem, pk=pk, order=order)
     if request.method == 'POST':
-        item.delete()
+        inventory_item = order_item.item
+        inventory_item.quantity += order_item.quantity
+        inventory_item.save()
+        order_item.delete()
         return redirect('order_detail', pk=order_pk)
     return redirect('order_detail', pk=order_pk)

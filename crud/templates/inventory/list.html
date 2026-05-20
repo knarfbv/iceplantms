@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function updateStock(element) {
     const id = element.dataset.id;
-    const quantity = element.value;
+    const quantity = element.value || 0;
     
     fetch(`/inventory/${id}/update-stock/`, {
         method: 'POST',
