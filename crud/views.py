@@ -28,6 +28,35 @@ def logout_view(request):
 
 
 @login_required(login_url='login')
+def dashboard(request):
+    total_orders = Order.objects.count()
+    pending_orders = Order.objects.filter(status='pending').count()
+    confirmed_orders = Order.objects.filter(status='confirmed').count()
+    delivered_orders = Order.objects.filter(status='delivered').count()
+    cancelled_orders = Order.objects.filter(status='cancelled').count()
+
+    total_revenue = sum(o.total for o in Order.objects.filter(status='delivered'))
+
+    low_stock = Inventory.objects.filter(quantity__lte=10).order_by('quantity')
+    recent_orders = Order.objects.select_related('customer').order_by('-order_date')[:5]
+    total_customers = Customer.objects.count()
+    total_products = Inventory.objects.count()
+
+    return render(request, 'dashboard.html', {
+        'total_orders': total_orders,
+        'pending_orders': pending_orders,
+        'confirmed_orders': confirmed_orders,
+        'delivered_orders': delivered_orders,
+        'cancelled_orders': cancelled_orders,
+        'total_revenue': total_revenue,
+        'low_stock': low_stock,
+        'recent_orders': recent_orders,
+        'total_customers': total_customers,
+        'total_products': total_products,
+    })
+
+
+@login_required(login_url='login')
 def inventory_list(request):
     items = Inventory.objects.all()
     return render(request, 'inventory/list.html', {'items': items})
