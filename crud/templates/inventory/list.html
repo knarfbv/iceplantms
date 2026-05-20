@@ -30,10 +30,15 @@
                 <td class="px-6 py-4 text-arctic-800 font-medium">{{ item.name }}</td>
                 <td class="px-6 py-4 text-frost-600">{{ item.size }}</td>
                 <td class="px-6 py-4 text-frost-600">₱{{ item.price }}</td>
-                <td class="px-6 py-4 text-frost-600">{{ item.quantity }}</td>
+                <td class="px-6 py-4 text-frost-600">
+                    <input type="number" 
+                        class="stock-input w-20 px-2 py-1 border border-frost-300 rounded text-center" 
+                        data-id="{{ item.pk }}" 
+                        value="{{ item.quantity }}" 
+                        min="0">
+                </td>
                 <td class="px-6 py-4 text-frost-600">{{ item.last_updated|date:"M d, Y" }}</td>
                 <td class="px-6 py-4 flex gap-3">
-                    <a href="{% url 'inventory_add_stock' item.pk %}" class="text-green-600 hover:text-green-800 transition">+Stock</a>
                     <a href="{% url 'inventory_edit' item.pk %}" class="text-ice-600 hover:text-ice-800 transition">Edit</a>
                     <a href="{% url 'inventory_delete' item.pk %}" class="text-red-400 hover:text-red-600 transition">Delete</a>
                 </td>
@@ -46,4 +51,59 @@
         </tbody>
     </table>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.stock-input').forEach(input => {
+        input.addEventListener('blur', function() {
+            updateStock(this);
+        });
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.blur();
+            }
+        });
+    });
+});
+
+function updateStock(element) {
+    const id = element.dataset.id;
+    const quantity = element.value;
+    
+    fetch(`/inventory/${id}/update-stock/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({quantity: quantity})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            alert('Failed to update stock: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update stock');
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
 {% endblock %}

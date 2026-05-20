@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Inventory, Customer, Order, OrderItem
@@ -58,15 +59,18 @@ def inventory_delete(request, pk):
     return render(request, 'inventory/delete.html', {'item': item})
 
 @login_required(login_url='login')
-def inventory_add_stock(request, pk):
-    item = get_object_or_404(Inventory, pk=pk)
+def inventory_update_stock(request, pk):
     if request.method == 'POST':
-        added = int(request.POST.get('quantity', 0))
-        if added > 0:
-            item.quantity += added
+        import json
+        data = json.loads(request.body)
+        item = get_object_or_404(Inventory, pk=pk)
+        quantity = int(data.get('quantity', 0))
+        if quantity >= 0:
+            item.quantity = quantity
             item.save()
-        return redirect('inventory_list')
-    return render(request, 'inventory/add_stock.html', {'item': item})
+            return JsonResponse({'success': True, 'quantity': item.quantity})
+        return JsonResponse({'success': False, 'error': 'Invalid quantity'})
+    return JsonResponse({'success': False, 'error': 'Invalid method'}, status=405)
 
 
 @login_required(login_url='login')

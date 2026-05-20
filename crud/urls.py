@@ -9,7 +9,7 @@ urlpatterns = [
     path('inventory/add/', views.inventory_add, name='inventory_add'),
     path('inventory/<int:pk>/edit/', views.inventory_edit, name='inventory_edit'),
     path('inventory/<int:pk>/delete/', views.inventory_delete, name='inventory_delete'),
-    path('inventory/<int:pk>/add-stock/', views.inventory_add_stock, name='inventory_add_stock'),
+    path('inventory/<int:pk>/update-stock/', views.inventory_update_stock, name='inventory_update_stock'),
 
     path('customers/', views.customer_list, name='customer_list'),
     path('customers/add/', views.customer_add, name='customer_add'),
