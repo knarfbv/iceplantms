@@ -6,13 +6,14 @@
 <div class="flex items-center justify-between mb-6">
     <h2 class="text-2xl font-semibold text-arctic-800">Inventory</h2>
     <div class="flex gap-2">
-        <a href="{% url 'inventory_add' %}" class="bg-ice-500 hover:bg-ice-600 text-white text-sm px-4 py-2 rounded-lg transition">
+        <a href="{% url 'inventory_add' %}" class="bg-ice-500 hover:bg-ice-600 focus:ring-2 focus:ring-ice-400 focus:outline-none text-white text-sm px-4 py-2 rounded-lg transition">
             + Add Item
         </a>
     </div>
 </div>
 
-<div class="bg-white rounded-xl border border-frost-200 overflow-hidden">
+<div class="bg-white rounded-xl border border-frost-200 overflow-hidden transition hover:shadow-md">
+    <div class="overflow-x-auto">
     <table class="w-full text-sm">
         <thead class="bg-frost-100 text-frost-600 uppercase text-xs">
             <tr>
@@ -32,15 +33,15 @@
                 <td class="px-6 py-4 text-frost-600">₱{{ item.price }}</td>
                 <td class="px-6 py-4 text-frost-600">
                     <input type="number" 
-                        class="stock-input w-20 px-2 py-1 border border-frost-300 rounded text-center" 
+                        class="stock-input w-20 px-2 py-1 border border-frost-200 rounded text-center focus:outline-none focus:ring-2 focus:ring-ice-400" 
                         data-id="{{ item.pk }}" 
                         value="{{ item.quantity }}" 
                         min="0">
                 </td>
                 <td class="px-6 py-4 text-frost-600">{{ item.last_updated|date:"M d, Y" }}</td>
                 <td class="px-6 py-4 flex gap-3">
-                    <a href="{% url 'inventory_edit' item.pk %}" class="text-ice-600 hover:text-ice-800 transition">Edit</a>
-                    <a href="{% url 'inventory_delete' item.pk %}" class="text-red-400 hover:text-red-600 transition">Delete</a>
+                    <a href="{% url 'inventory_edit' item.pk %}" class="text-ice-500 hover:text-ice-700 focus:ring-2 focus:ring-ice-400 focus:outline-none rounded transition">Edit</a>
+                    <a href="{% url 'inventory_delete' item.pk %}" class="text-crimson-500 hover:text-crimson-700 focus:ring-2 focus:ring-crimson-300 focus:outline-none rounded transition">Delete</a>
                 </td>
             </tr>
             {% empty %}

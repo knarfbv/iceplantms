@@ -17,9 +17,9 @@
         <div class="bg-white rounded-xl border border-frost-200 p-8">
             <h2 class="text-lg font-semibold text-arctic-800 mb-6">Sign in</h2>
 
-            {% if error %}
-            <p class="text-red-400 text-sm mb-4">{{ error }}</p>
-            {% endif %}
+             {% if error %}
+             <p class="error-msg text-crimson-500 text-sm mb-4 rounded">{{ error }}</p>
+             {% endif %}
 
             <form method="POST" class="space-y-4">
                 {% csrf_token %}

@@ -6,15 +6,15 @@ class InventoryForm(forms.ModelForm):
         model = Inventory
         fields = ['name', 'size', 'price']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'w-full text-sm border border-frost-200 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
-            'size': forms.TextInput(attrs={'class': 'w-full text-sm border border-frost-200 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
-            'price': forms.NumberInput(attrs={'class': 'w-full text-sm border border-frost-200 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
+            'name': forms.TextInput(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
+            'size': forms.TextInput(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
+            'price': forms.NumberInput(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
         }
 
 class CustomerForm(forms.ModelForm):
     address = forms.CharField(
         widget=forms.Textarea(attrs={
-            'class': 'w-full text-sm border border-frost-200 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400',
+            'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400',
             'rows': 3
         })
     )
@@ -23,15 +23,15 @@ class CustomerForm(forms.ModelForm):
         model = Customer
         fields = ['name', 'address', 'phone']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'w-full text-sm border border-frost-200 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
-            'phone': forms.TextInput(attrs={'class': 'w-full text-sm border border-frost-200 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
+            'name': forms.TextInput(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
+            'phone': forms.TextInput(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
         }
 
 class OrderForm(forms.ModelForm):
     customer = forms.ModelChoiceField(
         queryset=Customer.objects.all(),
         empty_label="Select customer...",
-        widget=forms.Select(attrs={'class': 'w-full text-sm border border-frost-200 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'})
+        widget=forms.Select(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'})
     )
 
     class Meta:
@@ -42,14 +42,14 @@ class OrderItemForm(forms.ModelForm):
     quantity = forms.IntegerField(
         min_value=1, 
         initial=1,
-        widget=forms.NumberInput(attrs={'class': 'w-full text-sm border border-frost-200 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'})
+        widget=forms.NumberInput(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'})
     )
 
     class Meta:
         model = OrderItem
         fields = ['item', 'quantity']
         widgets = {
-            'item': forms.Select(attrs={'class': 'w-full text-sm border border-frost-200 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
+            'item': forms.Select(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'}),
         }
 
     def __init__(self, *args, **kwargs):

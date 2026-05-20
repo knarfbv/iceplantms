@@ -7,9 +7,9 @@
     <link href="{% static 'css/output.css' %}" rel="stylesheet">
     <title>{% block 'title' %}{% endblock 'title' %}</title>
 </head>
-<body class="flex h-screen bg-frost-50 text-frost-900">
+<body class="m-0 min-h-screen flex flex-col sm:flex-row bg-frost-50 text-frost-900">
     {% include 'include/sidebar.html' %}
-    <main class="flex-1 overflow-y-auto p-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         {% block 'content' %}{% endblock 'content' %}
     </main>
 </body>
