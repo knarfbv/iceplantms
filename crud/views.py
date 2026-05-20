@@ -47,6 +47,10 @@ def inventory_edit(request, pk):
     form = InventoryForm(request.POST or None, instance=item)
     if form.is_valid():
         form.save()
+        item.orderitem_set.filter(order__status='pending').update(
+            item_name=item.name,
+            item_price=item.price,
+        )
         return redirect('inventory_list')
     return render(request, 'inventory/form.html', {'form': form})
 
@@ -105,6 +109,11 @@ def customer_edit(request, pk):
     form = CustomerForm(request.POST or None, instance=customer)
     if form.is_valid():
         form.save()
+        customer.order_set.filter(status='pending').update(
+            customer_name=customer.name,
+            customer_phone=customer.phone,
+            customer_address=customer.address,
+        )
         return redirect('customer_list')
     return render(request, 'customers/form.html', {'form': form})
 
@@ -184,6 +193,16 @@ def order_update_status(request, pk):
                     if order_item.item:
                         order_item.item.quantity -= order_item.quantity
                         order_item.item.save()
+            if status == 'pending':
+                if order.customer:
+                    order.customer_name = order.customer.name
+                    order.customer_phone = order.customer.phone
+                    order.customer_address = order.customer.address
+                for order_item in order.items.select_related('item').all():
+                    if order_item.item:
+                        order_item.item_name = order_item.item.name
+                        order_item.item_price = order_item.item.price
+                        order_item.save()
             order.status = status
             order.save()
             return redirect('order_detail', pk=pk)
