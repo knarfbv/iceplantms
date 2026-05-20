@@ -34,9 +34,7 @@ def dashboard(request):
     confirmed_orders = Order.objects.filter(status='confirmed').count()
     delivered_orders = Order.objects.filter(status='delivered').count()
     cancelled_orders = Order.objects.filter(status='cancelled').count()
-
     total_revenue = sum(o.total for o in Order.objects.filter(status='delivered'))
-
     low_stock = Inventory.objects.filter(quantity__lte=10).order_by('quantity')
     recent_orders = Order.objects.select_related('customer').order_by('-order_date')[:5]
     total_customers = Customer.objects.count()
@@ -78,6 +76,7 @@ def inventory_edit(request, pk):
         form.save()
         item.orderitem_set.filter(order__status='pending').update(
             item_name=item.name,
+            item_size=item.size,
             item_price=item.price,
         )
         return redirect('inventory_list')
@@ -117,11 +116,9 @@ def customer_list(request):
         )
     else:
         customers_list = Customer.objects.all()
-
     paginator = Paginator(customers_list, 10)
     page_number = request.GET.get('page')
     customers = paginator.get_page(page_number)
-
     return render(request, 'customers/list.html', {'customers': customers, 'query': query})
 
 @login_required(login_url='login')
@@ -165,11 +162,9 @@ def order_list(request):
             Q(customer__name__icontains=query) |
             Q(status__icontains=query)
         )
-
     paginator = Paginator(orders_list, 10)
     page_number = request.GET.get('page')
     orders = paginator.get_page(page_number)
-
     return render(request, 'orders/list.html', {'orders': orders, 'query': query})
 
 @login_required(login_url='login')
@@ -189,7 +184,12 @@ def order_add(request):
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
     items = order.items.select_related('item').all()
-    return render(request, 'orders/detail.html', {'order': order, 'items': items})
+    from_dashboard = request.GET.get('from') == 'dashboard'
+    return render(request, 'orders/detail.html', {
+        'order': order, 
+        'items': items,
+        'from_dashboard': from_dashboard
+    })
 
 @login_required(login_url='login')
 def order_delete(request, pk):
@@ -230,6 +230,7 @@ def order_update_status(request, pk):
                 for order_item in order.items.select_related('item').all():
                     if order_item.item:
                         order_item.item_name = order_item.item.name
+                        order_item.item_size = order_item.item.size
                         order_item.item_price = order_item.item.price
                         order_item.save()
             order.status = status
@@ -249,6 +250,7 @@ def order_item_add(request, order_pk):
             form.add_error('quantity', 'Not enough stock available.')
         else:
             order_item.item_name = inventory_item.name
+            order_item.item_size = inventory_item.size
             order_item.item_price = inventory_item.price
             order_item.save()
             inventory_item.quantity -= order_item.quantity
@@ -261,19 +263,52 @@ def order_item_edit(request, order_pk, pk):
     order = get_object_or_404(Order, pk=order_pk)
     order_item = get_object_or_404(OrderItem, pk=pk, order=order)
     old_quantity = order_item.quantity
+    old_inventory_item = order_item.item
+    selected_stock = old_inventory_item.quantity if old_inventory_item else None
     form = OrderItemForm(request.POST or None, instance=order_item)
     if form.is_valid():
         new_quantity = form.cleaned_data['quantity']
-        diff = new_quantity - old_quantity
-        inventory_item = order_item.item
-        if diff > 0 and inventory_item.quantity < diff:
-            form.add_error('quantity', 'Not enough stock.')
+        new_inventory_item = form.cleaned_data['item']
+        item_changed = old_inventory_item != new_inventory_item
+
+        if item_changed:
+            if new_inventory_item.quantity < new_quantity:
+                selected_stock = new_inventory_item.quantity
+                form.add_error('quantity', 'Not enough stock.')
+            else:
+                form.save()
+                order_item.item_name = new_inventory_item.name
+                order_item.item_size = new_inventory_item.size
+                order_item.item_price = new_inventory_item.price
+                order_item.save()
+                if old_inventory_item:
+                    old_inventory_item.quantity += old_quantity
+                    old_inventory_item.save()
+                new_inventory_item.quantity -= new_quantity
+                new_inventory_item.save()
+                return redirect('order_detail', pk=order_pk)
         else:
-            form.save()
-            inventory_item.quantity -= diff
-            inventory_item.save()
-            return redirect('order_detail', pk=order_pk)
-    return render(request, 'orders/item_form.html', {'form': form, 'order': order, 'item': order_item})
+            diff = new_quantity - old_quantity
+            if diff > 0 and new_inventory_item.quantity < diff:
+                selected_stock = new_inventory_item.quantity
+                form.add_error('quantity', 'Not enough stock.')
+            else:
+                form.save()
+                order_item.item_name = new_inventory_item.name
+                order_item.item_size = new_inventory_item.size
+                order_item.item_price = new_inventory_item.price
+                order_item.save()
+                new_inventory_item.quantity -= diff
+                new_inventory_item.save()
+                return redirect('order_detail', pk=order_pk)
+
+    return render(request, 'orders/item_form.html', {
+        'form': form,
+        'order': order,
+        'item': order_item,
+        'selected_stock': selected_stock,
+        'show_stock': selected_stock is not None,
+    })
 
 @login_required(login_url='login')
 def order_item_delete(request, order_pk, pk):

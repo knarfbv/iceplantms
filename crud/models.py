@@ -46,6 +46,7 @@ class OrderItem(models.Model):
     item = models.ForeignKey(Inventory, on_delete=models.SET_NULL, null=True)
     quantity = models.PositiveIntegerField()
     item_name = models.CharField(max_length=100, default='')
+    item_size = models.CharField(max_length=50, default='')
     item_price = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
     @property

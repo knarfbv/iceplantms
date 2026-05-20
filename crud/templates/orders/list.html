@@ -33,12 +33,12 @@
     <table class="w-full text-sm">
         <thead class="bg-frost-100 text-frost-600 uppercase text-xs">
             <tr>
-                <th class="px-6 py-3 text-left">Order #</th>
+                <th class="px-6 py-3 text-left">Order</th>
                 <th class="px-6 py-3 text-left">Customer</th>
                 <th class="px-6 py-3 text-left">Status</th>
                 <th class="px-6 py-3 text-left">Date</th>
                 <th class="px-6 py-3 text-left">Total</th>
-                <th class="px-6 py-3 text-left">Actions</th>
+                <th class="px-6 py-3 text-left"></th>
             </tr>
         </thead>
         <tbody class="divide-y divide-frost-100">
@@ -65,7 +65,7 @@
                 <td class="px-6 py-4 text-frost-600">{{ order.order_date|date:"M d, Y" }}</td>
                 <td class="px-6 py-4 text-frost-600">₱{{ order.total }}</td>
                 <td class="px-6 py-4">
-                    <a href="{% url 'order_detail' order.pk %}" class="text-ice-600 hover:text-ice-800 transition">View</a>
+                    <a href="{% url 'order_detail' order.pk %}" class="text-ice-600 hover:text-ice-800 transition">View →</a>
                 </td>
             </tr>
             {% empty %}

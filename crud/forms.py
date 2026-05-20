@@ -22,3 +22,15 @@ class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
         fields = ['item', 'quantity']
+
+class OrderItemForm(forms.ModelForm):
+    quantity = forms.IntegerField(min_value=1, initial=1)
+
+    class Meta:
+        model = OrderItem
+        fields = ['item', 'quantity']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['item'].queryset = Inventory.objects.all()
+        self.fields['item'].label_from_instance = lambda obj: f"{obj.name} ({obj.size}) - Stock: {obj.quantity}"
