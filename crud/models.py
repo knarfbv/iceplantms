@@ -27,7 +27,10 @@ class Order(models.Model):
         ("delivered", "Delivered"),
         ("cancelled", "Cancelled"),
     ]
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    customer_name = models.CharField(max_length=100, default='')
+    customer_phone = models.CharField(max_length=15, default='')
+    customer_address = models.CharField(max_length=255, default='')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     order_date = models.DateTimeField(auto_now_add=True)
 
@@ -40,7 +43,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    item = models.ForeignKey(Inventory, on_delete=models.SET_NULL, null=True, blank=True)
+    item = models.ForeignKey(Inventory, on_delete=models.SET_NULL, null=True)
     quantity = models.PositiveIntegerField()
     item_name = models.CharField(max_length=100, default='')
     item_price = models.DecimalField(max_digits=5, decimal_places=2, default=0)

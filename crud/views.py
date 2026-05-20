@@ -138,8 +138,13 @@ def order_list(request):
 def order_add(request):
     form = OrderForm(request.POST or None)
     if form.is_valid():
-        form.save()
-        return redirect('order_detail', pk=form.instance.pk)
+        order = form.save(commit=False)
+        customer = order.customer
+        order.customer_name = customer.name
+        order.customer_phone = customer.phone
+        order.customer_address = customer.address
+        order.save()
+        return redirect('order_detail', pk=order.pk)
     return render(request, 'orders/form.html', {'form': form})
 
 @login_required(login_url='login')
@@ -156,8 +161,9 @@ def order_delete(request, pk):
     if request.method == 'POST':
         if order.status == 'pending':
             for order_item in order.items.select_related('item').all():
-                order_item.item.quantity += order_item.quantity
-                order_item.item.save()
+                if order_item.item:
+                    order_item.item.quantity += order_item.quantity
+                    order_item.item.save()
         order.delete()
         return redirect('order_list')
     return render(request, 'orders/delete.html', {'order': order})
@@ -170,12 +176,14 @@ def order_update_status(request, pk):
         if status in dict(Order.STATUS_CHOICES):
             if status == 'cancelled' and order.status != 'cancelled':
                 for order_item in order.items.select_related('item').all():
-                    order_item.item.quantity += order_item.quantity
-                    order_item.item.save()
+                    if order_item.item:
+                        order_item.item.quantity += order_item.quantity
+                        order_item.item.save()
             elif order.status == 'cancelled' and status != 'cancelled':
                 for order_item in order.items.select_related('item').all():
-                    order_item.item.quantity -= order_item.quantity
-                    order_item.item.save()
+                    if order_item.item:
+                        order_item.item.quantity -= order_item.quantity
+                        order_item.item.save()
             order.status = status
             order.save()
             return redirect('order_detail', pk=pk)
@@ -224,9 +232,9 @@ def order_item_delete(request, order_pk, pk):
     order = get_object_or_404(Order, pk=order_pk)
     order_item = get_object_or_404(OrderItem, pk=pk, order=order)
     if request.method == 'POST':
-        inventory_item = order_item.item
-        inventory_item.quantity += order_item.quantity
-        inventory_item.save()
+        if order_item.item:
+            order_item.item.quantity += order_item.quantity
+            order_item.item.save()
         order_item.delete()
         return redirect('order_detail', pk=order_pk)
     return redirect('order_detail', pk=order_pk)
