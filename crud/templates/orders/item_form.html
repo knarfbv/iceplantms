@@ -3,7 +3,7 @@
 {% block 'title' %}{% if item %}Edit Item{% else %}Add Item{% endif %}{% endblock %}
 
 {% block 'content' %}
-<div class="max-w-lg">
+<div class="max-w-lg mx-auto">
     <h2 class="text-2xl font-semibold text-arctic-800 mb-6">
         {% if item %}Edit Item in Order #{{ order.pk }}{% else %}Add Item to Order #{{ order.pk }}{% endif %}
     </h2>
