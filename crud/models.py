@@ -33,23 +33,25 @@ class Order(models.Model):
 
     @property
     def total(self):
-        return sum(item.quantity * item.item.price for item in self.items.all())
+        return sum(item.quantity * item.item_price for item in self.items.all())
 
     def __str__(self):
         return f"Order #{self.pk} - {self.customer.name}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    item = models.ForeignKey(Inventory, on_delete=models.CASCADE)
+    item = models.ForeignKey(Inventory, on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.PositiveIntegerField()
+    item_name = models.CharField(max_length=100, default='')
+    item_price = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
     @property
     def unit_price(self):
-        return self.item.price
+        return self.item_price
 
     @property
     def subtotal(self):
-        return self.quantity * self.item.price
+        return self.quantity * self.item_price
 
     def __str__(self):
-        return f"{self.quantity}x {self.item.name}"
+        return f"{self.quantity}x {self.item_name}"

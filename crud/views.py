@@ -192,6 +192,8 @@ def order_item_add(request, order_pk):
         if inventory_item.quantity < order_item.quantity:
             form.add_error('quantity', 'Not enough stock available.')
         else:
+            order_item.item_name = inventory_item.name
+            order_item.item_price = inventory_item.price
             order_item.save()
             inventory_item.quantity -= order_item.quantity
             inventory_item.save()
