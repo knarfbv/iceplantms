@@ -17,7 +17,12 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
     <div class="bg-white rounded-xl border border-frost-200 p-6 transition hover:shadow-md">
-        <h3 class="text-sm font-medium text-frost-500 uppercase mb-4">Order Info</h3>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-medium text-frost-500 uppercase">Order Info</h3>
+            {% if order.status == 'pending' %}
+            <a href="{% url 'order_edit' order.pk %}" class="text-ice-500 hover:text-ice-700 text-sm transition">Edit</a>
+            {% endif %}
+        </div>
         <p class="text-sm text-frost-600 mb-2">Customer:
             <span class="{% if not order.customer %}line-through text-frost-400{% else %}text-arctic-800 font-medium{% endif %}">
                 {{ order.customer_name }}

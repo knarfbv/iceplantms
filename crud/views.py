@@ -185,6 +185,22 @@ def order_add(request):
     return render(request, 'orders/form.html', {'form': form})
 
 @login_required(login_url='login')
+def order_edit(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    if order.status != 'pending':
+        return redirect('order_detail', pk=pk)
+    form = OrderForm(request.POST or None, instance=order)
+    if form.is_valid():
+        order = form.save()
+        if order.customer:
+            order.customer_name = order.customer.name
+            order.customer_phone = order.customer.phone
+            order.customer_address = order.customer.address
+            order.save()
+        return redirect('order_detail', pk=order.pk)
+    return render(request, 'orders/form.html', {'form': form, 'order': order})
+
+@login_required(login_url='login')
 def order_detail(request, pk):
     order = get_object_or_404(Order, pk=pk)
     items = order.items.select_related('item').all()
