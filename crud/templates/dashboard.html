@@ -39,11 +39,11 @@
 </div>
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-    <div class="bg-aurora-50 border border-aurora-100 rounded-xl p-5 transition hover:shadow-md">
+    <div class="bg-aurora-50 border border-aurora-200 rounded-xl p-5 transition hover:shadow-md">
         <p class="text-xs font-medium text-aurora-600 uppercase mb-1">Pending</p>
         <p class="text-2xl font-bold text-aurora-700">{{ pending_orders }}</p>
     </div>
-    <div class="bg-ice-50 border border-ice-100 rounded-xl p-5 transition hover:shadow-md">
+    <div class="bg-ice-50 border border-ice-200 rounded-xl p-5 transition hover:shadow-md">
         <p class="text-xs font-medium text-ice-600 uppercase mb-1">Confirmed</p>
         <p class="text-2xl font-bold text-ice-700">{{ confirmed_orders }}</p>
     </div>
@@ -51,9 +51,9 @@
         <p class="text-xs font-medium text-glacier-600 uppercase mb-1">Delivered</p>
         <p class="text-2xl font-bold text-glacier-700">{{ delivered_orders }}</p>
     </div>
-    <div class="bg-crimson-50 border border-crimson-100 rounded-xl p-5 transition hover:shadow-md">
-        <p class="text-xs font-medium text-crimson-500 uppercase mb-1">Cancelled</p>
-        <p class="text-2xl font-bold text-crimson-600">{{ cancelled_orders }}</p>
+    <div class="bg-crimson-50 border border-crimson-200 rounded-xl p-5 transition hover:shadow-md">
+        <p class="text-xs font-medium text-crimson-600 uppercase mb-1">Cancelled</p>
+        <p class="text-2xl font-bold text-crimson-700">{{ cancelled_orders }}</p>
     </div>
 </div>
 
@@ -112,13 +112,13 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-frost-200 overflow-hidden transition hover:shadow-md">
+    <div class="bg-white rounded-xl border border-frost-200 overflow-hidden transition hover:shadow-md flex flex-col">
         <div class="px-6 py-4 border-b border-frost-100">
             <h3 class="text-sm font-medium text-arctic-800">Low Stock Items <span class="text-xs font-normal text-frost-400">(≤ 10)</span></h3>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto flex-1 overflow-y-auto max-h-66">
         <table class="w-full text-sm">
-            <thead class="bg-frost-100 text-frost-600 uppercase text-xs font-medium">
+            <thead class="bg-frost-100 text-frost-600 uppercase text-xs font-medium sticky top-0 z-10">
                 <tr>
                     <th class="px-6 py-3 text-left">Product</th>
                     <th class="px-6 py-3 text-left">Size</th>
