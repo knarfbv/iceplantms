@@ -11,14 +11,14 @@ from .forms import InventoryForm, CustomerForm, OrderForm, OrderItemForm
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('order_list')
+        return redirect('dashboard')
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            return redirect('order_list')
+            return redirect('dashboard')
         return render(request, 'auth/login.html', {'error': 'Invalid username or password.'})
     return render(request, 'auth/login.html')
 
