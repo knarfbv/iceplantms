@@ -57,8 +57,18 @@ def dashboard(request):
 
 @login_required(login_url='login')
 def inventory_list(request):
-    items = Inventory.objects.all().order_by('name', 'size')
-    return render(request, 'inventory/list.html', {'items': items})
+    query = request.GET.get('q', '')
+    if query:
+        items_list = Inventory.objects.filter(
+            Q(name__icontains=query) |
+            Q(size__icontains=query)
+        ).order_by('name', 'size')
+    else:
+        items_list = Inventory.objects.all().order_by('name', 'size')
+    paginator = Paginator(items_list, 10)
+    page_number = request.GET.get('page')
+    items = paginator.get_page(page_number)
+    return render(request, 'inventory/list.html', {'items': items, 'query': query})
 
 def inventory_add(request):
     form = InventoryForm(request.POST or None)
