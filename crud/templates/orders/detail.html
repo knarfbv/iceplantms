@@ -33,7 +33,7 @@
                 {{ order.customer_address }}
             </span>
         </p>
-        <p class="text-sm text-frost-600 mb-2">Date: <span class="text-arctic-800">{{ order.order_date|date:"M d, Y" }}</span></p>
+        <p class="text-sm text-frost-600 mb-2">Date: <span class="text-arctic-800">{{ order.order_date|date:"M d, Y g:i A" }}</span></p>
         <p class="text-sm text-frost-600">Status:
             <span class="px-2.5 py-1 rounded-full text-xs font-medium
                 {% if order.status == 'pending' %} bg-aurora-100 text-aurora-700

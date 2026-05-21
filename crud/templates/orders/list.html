@@ -63,7 +63,7 @@
                         {{ order.get_status_display }}
                     </span>
                 </td>
-                <td class="px-6 py-4 text-frost-600">{{ order.order_date|date:"M d, Y" }}</td>
+                <td class="px-6 py-4 text-frost-600">{{ order.order_date|date:"M d, Y g:i A" }}</td>
                 <td class="px-6 py-4 text-frost-600">₱{{ order.total }}</td>
                 <td class="px-6 py-4">
                     <a href="{% url 'order_detail' order.pk %}" class="text-ice-500 hover:text-ice-700 focus:ring-2 focus:ring-ice-400 focus:outline-none rounded text-sm transition">View →</a>

@@ -33,10 +33,20 @@ class OrderForm(forms.ModelForm):
         empty_label="Select customer...",
         widget=forms.Select(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'})
     )
+    order_date = forms.DateTimeField(
+        widget=forms.DateTimeInput(
+            attrs={
+                'type': 'datetime-local',
+                'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400',
+            },
+            format='%Y-%m-%dT%H:%M',
+        ),
+        input_formats=['%Y-%m-%dT%H:%M'],
+    )
 
     class Meta:
         model = Order
-        fields = ['customer']
+        fields = ['customer', 'order_date']
 
 class OrderItemForm(forms.ModelForm):
     quantity = forms.IntegerField(

@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 # Create your models here.
 
@@ -32,7 +33,7 @@ class Order(models.Model):
     customer_phone = models.CharField(max_length=15, default='')
     customer_address = models.CharField(max_length=255, default='')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
-    order_date = models.DateTimeField(auto_now_add=True)
+    order_date = models.DateTimeField(default=datetime.now)
 
     @property
     def total(self):
