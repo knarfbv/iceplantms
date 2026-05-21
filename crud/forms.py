@@ -29,7 +29,7 @@ class CustomerForm(forms.ModelForm):
 
 class OrderForm(forms.ModelForm):
     customer = forms.ModelChoiceField(
-        queryset=Customer.objects.all(),
+        queryset=Customer.objects.all().order_by('name', 'address'),
         empty_label="Select customer...",
         widget=forms.Select(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'})
     )
@@ -50,7 +50,7 @@ class OrderForm(forms.ModelForm):
 
 class OrderItemForm(forms.ModelForm):
     quantity = forms.IntegerField(
-        min_value=1, 
+        min_value=1,
         initial=1,
         widget=forms.NumberInput(attrs={'class': 'w-full text-sm border border-frost-300 rounded-lg px-3 py-2 text-frost-800 focus:outline-none focus:ring-2 focus:ring-ice-400'})
     )
@@ -64,6 +64,6 @@ class OrderItemForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['item'].queryset = Inventory.objects.all()
+        self.fields['item'].queryset = Inventory.objects.all().order_by('name', 'size')
         self.fields['item'].empty_label = "Select item..."
         self.fields['item'].label_from_instance = lambda obj: f"{obj.name} ({obj.size}) - Stock: {obj.quantity}"

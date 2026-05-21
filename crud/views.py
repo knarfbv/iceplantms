@@ -57,7 +57,7 @@ def dashboard(request):
 
 @login_required(login_url='login')
 def inventory_list(request):
-    items = Inventory.objects.all()
+    items = Inventory.objects.all().order_by('name', 'size')
     return render(request, 'inventory/list.html', {'items': items})
 
 def inventory_add(request):
@@ -114,9 +114,9 @@ def customer_list(request):
             Q(name__icontains=query) |
             Q(phone__icontains=query) |
             Q(address__icontains=query)
-        )
+        ).order_by('name', 'address')
     else:
-        customers_list = Customer.objects.all()
+        customers_list = Customer.objects.all().order_by('name', 'address')
     paginator = Paginator(customers_list, 10)
     page_number = request.GET.get('page')
     customers = paginator.get_page(page_number)
@@ -156,13 +156,13 @@ def customer_delete(request, pk):
 @login_required(login_url='login')
 def order_list(request):
     query = request.GET.get('q', '')
-    orders_list = Order.objects.select_related('customer')
+    orders_list = Order.objects.select_related('customer').order_by('-order_date')
     if query:
         orders_list = orders_list.filter(
             Q(id__icontains=query) |
             Q(customer__name__icontains=query) |
             Q(status__icontains=query)
-        )
+        ).order_by('-order_date')
     paginator = Paginator(orders_list, 10)
     page_number = request.GET.get('page')
     orders = paginator.get_page(page_number)
