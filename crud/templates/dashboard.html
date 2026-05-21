@@ -3,9 +3,16 @@
 {% block 'title' %}Dashboard{% endblock %}
 
 {% block 'content' %}
-<div class="mb-6">
-    <h2 class="text-2xl font-semibold text-arctic-800">Dashboard</h2>
+<div class="mb-6 flex items-start justify-between flex-wrap gap-4">
+  <span id="username" class="hidden">{{ user.get_full_name|default:user.username }}</span>
+  <div>
+    <h2 id="greeting" class="text-2xl font-semibold text-arctic-800"></h2>
     <p class="text-sm text-frost-400 mt-1">Overview of your ice plant operations</p>
+  </div>
+  <div class="bg-white border border-frost-200 rounded-xl px-5 py-3 text-right hover:shadow-md transition">
+    <p id="clock" class="text-2xl font-semibold text-arctic-800 tabular-nums"></p>
+    <p id="date" class="text-xs text-frost-400 mt-1"></p>
+  </div>
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
