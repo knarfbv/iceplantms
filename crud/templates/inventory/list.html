@@ -50,7 +50,11 @@
                 <td class="px-6 py-4 text-frost-600">₱{{ item.price }}</td>
                 <td class="px-6 py-4 text-frost-600">
                     <input type="number" 
-                        class="stock-input w-20 px-2 py-1 border border-frost-200 rounded text-center focus:outline-none focus:ring-2 focus:ring-ice-400" 
+                        class="stock-input w-20 px-2 py-1 border rounded text-center focus:outline-none focus:ring-2 focus:ring-ice-400
+                            {% if item.quantity == 0 %} border-crimson-300 bg-crimson-50 text-crimson-600
+                            {% elif item.quantity <= 10 %} border-aurora-300 bg-aurora-50 text-aurora-700
+                            {% else %} border-frost-300 text-frost-600
+                            {% endif %}" 
                         data-id="{{ item.pk }}" 
                         value="{{ item.quantity }}" 
                         min="0">
@@ -133,6 +137,16 @@ function updateStock(element) {
     .then(data => {
         if (!data.success) {
             alert('Failed to update stock: ' + (data.error || 'Unknown error'));
+        } else {
+            const qty = parseInt(element.value) || 0;
+            element.classList.remove('bg-crimson-50', 'bg-aurora-50', 'bg-aurora-50', 'border-crimson-300', 'border-aurora-300', 'border-frost-200', 'text-crimson-600', 'text-aurora-700', 'text-frost-600');
+            if (qty === 0) {
+                element.classList.add('bg-crimson-50', 'border-crimson-300', 'text-crimson-600');
+            } else if (qty <= 10) {
+                element.classList.add('bg-aurora-50', 'border-aurora-300', 'text-aurora-700');
+            } else {
+                element.classList.add('border-frost-200', 'text-frost-600');
+            }
         }
     })
     .catch(error => {
